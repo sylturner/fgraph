@@ -209,6 +209,13 @@ module FGraph
         :client_secret => client_secret,
         :redirect_uri => ''
       }.merge(options || {}))
+      
+      # borrowed fix from Dennis Wilson's pull request that never got merged
+      # https://github.com/jugend/fgraph/commit/80ba9240437c1030396e958fa1a75de0377676d0
+      # facebook will responde with an url query formated string json
+      # so ensure to avoid :xml or :json parse mode
+      global_format = format
+      format :html
     
       response = self.perform_get(url)
       response_hash = {}
@@ -216,6 +223,8 @@ module FGraph
         value_pair = value.split('=')
         response_hash[value_pair[0]] = value_pair[1]
       end
+      # restore global parser setting
+      format global_format      
       response_hash
     end
   
